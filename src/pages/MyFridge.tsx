@@ -1,13 +1,13 @@
 import { useNavigate, Link } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
 import { useAppStore } from "../store";
-import { isBefore, addDays, parseISO, differenceInDays } from "date-fns";
+import { parseISO, differenceInDays } from "date-fns";
 
 export default function MyFridge() {
   const navigate = useNavigate();
   const { inventory } = useAppStore();
 
-  const fridgeItems = inventory.filter(item => item.location === 'Fridge');
+  const fridgeItems = inventory.filter((item: any) => item.location === 'Fridge');
 
   return (
     <div className="bg-gradient-to-b from-[#ECFDF5] to-[#F9FAFB] min-h-screen font-display text-slate-900 pb-32">
@@ -39,7 +39,7 @@ export default function MyFridge() {
       </header>
 
       <main className="px-4 space-y-5">
-        {fridgeItems.map(item => {
+        {fridgeItems.map((item: any) => {
           const daysLeft = differenceInDays(parseISO(item.expiryDate), new Date());
           const isExpiring = daysLeft <= 3;
           const isUrgent = daysLeft <= 1;
@@ -87,7 +87,7 @@ export default function MyFridge() {
             <div className="bg-primary h-2 rounded-full w-[85%]"></div>
           </div>
           <p className="text-[11px] text-slate-500 mt-3 leading-relaxed">
-            You have {fridgeItems.length} items in your fridge. {fridgeItems.filter(i => differenceInDays(parseISO(i.expiryDate), new Date()) <= 3).length} items need your attention soon to avoid food waste.
+            You have {fridgeItems.length} items in your fridge. {fridgeItems.filter((i: any) => differenceInDays(parseISO(i.expiryDate), new Date()) <= 3).length} items need your attention soon to avoid food waste.
           </p>
         </div>
       </main>

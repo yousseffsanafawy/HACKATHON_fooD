@@ -1,15 +1,59 @@
 import { Link } from "react-router-dom";
-import BottomNav from "../components/BottomNav";
+import { useEffect, useState } from "react";
+import { useAuth } from "../hooks/useAuth";
 import { useAppStore } from "../store";
-import { isBefore, addDays, parseISO } from "date-fns";
+import { isBefore, addDays, parseISO, differenceInDays } from "date-fns";
+import BottomNav from "../components/BottomNav";
 
 export default function Home() {
-  const { user, inventory } = useAppStore();
-  
-  const expiringItems = inventory.filter(item => {
+  const { user: authUser } = useAuth();
+  const { user, inventory, syncWithFirebase } = useAppStore();
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Sync with Firebase when user is authenticated
+  useEffect(() => {
+    if (authUser) {
+      const userId = authUser.email.split('@')[0];
+      syncWithFirebase(userId);
+      setIsInitialLoad(false);
+    }
+  }, [authUser, syncWithFirebase]);
+
+  // Get expiring items (within 3 days)
+  const expiringItems = inventory.filter((item: any) => {
     const expiry = parseISO(item.expiryDate);
     return isBefore(expiry, addDays(new Date(), 3));
   });
+
+  // Calculate urgency level
+  const hasUrgent = expiringItems.some((item: any) => {
+    const daysLeft = differenceInDays(parseISO(item.expiryDate), new Date());
+    return daysLeft <= 1;
+  });
+
+  if (isInitialLoad) {
+    return (
+      <div className="bg-[#ECFDF5] min-h-screen pb-24">
+        <header className="flex items-center justify-between px-6 pt-8 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-slate-200 animate-pulse"></div>
+            <div className="space-y-2">
+              <div className="w-24 h-3 bg-slate-200 animate-pulse rounded"></div>
+              <div className="w-32 h-5 bg-slate-200 animate-pulse rounded"></div>
+            </div>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-slate-200 animate-pulse"></div>
+        </header>
+        <div className="px-4 space-y-6">
+          <div className="glass-card rounded-xl p-5 h-40 bg-slate-200 animate-pulse"></div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="aspect-[4/5] rounded-xl bg-slate-200 animate-pulse"></div>
+            <div className="aspect-[4/5] rounded-xl bg-slate-200 animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#ECFDF5] min-h-screen pb-24">
@@ -23,7 +67,7 @@ export default function Home() {
           </div>
           <div>
             <p className="text-slate-500 text-xs font-medium uppercase tracking-wider">Welcome back</p>
-            <h1 className="text-slate-900 text-xl font-bold">Good morning, {user?.name || 'Guest'}</h1>
+            <h1 className="text-slate-900 text-xl font-bold">Good morning, {authUser?.displayName || user?.name || 'Guest'}</h1>
           </div>
         </div>
         <Link to="/alerts" className="relative size-10 flex items-center justify-center rounded-full bg-white shadow-sm border border-emerald-100 text-slate-700">
@@ -38,17 +82,29 @@ export default function Home() {
         <div className="glass-card rounded-xl p-5 shadow-xl shadow-emerald-900/5 overflow-hidden relative">
           <div className="absolute top-0 right-0 -mt-4 -mr-4 size-24 bg-primary/10 rounded-full blur-2xl"></div>
           <div className="flex justify-between items-start mb-4">
-            <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${expiringItems.length > 0 ? 'bg-orange-100 text-orange-600' : 'bg-emerald-100 text-emerald-600'}`}>
-              <span className="material-symbols-outlined text-[18px]">{expiringItems.length > 0 ? 'warning' : 'check_circle'}</span>
-              <span className="text-xs font-bold tracking-wide uppercase">{expiringItems.length > 0 ? 'Orange Warning' : 'All Good'}</span>
+            <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${
+              hasUrgent 
+                ? 'bg-red-100 text-red-600' 
+                : expiringItems.length > 0 
+                  ? 'bg-orange-100 text-orange-600' 
+                  : 'bg-emerald-100 text-emerald-600'
+            }`}>
+              <span className="material-symbols-outlined text-[18px]">
+                {hasUrgent || expiringItems.length > 0 ? 'warning' : 'check_circle'}
+              </span>
+              <span className="text-xs font-bold tracking-wide uppercase">
+                {hasUrgent ? 'Red Alert' : expiringItems.length > 0 ? 'Orange Warning' : 'All Good'}
+              </span>
             </div>
             <span className="material-symbols-outlined text-slate-400">more_horiz</span>
           </div>
           <h2 className="text-slate-900 text-2xl font-bold mb-1">
-            {expiringItems.length > 0 ? `${expiringItems.length} items expiring soon` : 'Your fridge is fresh!'}
+            {expiringItems.length > 0 
+              ? `${expiringItems.length} item${expiringItems.length > 1 ? 's' : ''} expiring soon` 
+              : 'Your fridge is fresh!'}
           </h2>
           <p className="text-slate-600 text-sm mb-5 leading-relaxed">
-            {expiringItems.length > 0 
+            {expiringItems.length > 0
               ? `AI Insight: Use these soon to reduce waste. We've found recipes that use your expiring items.`
               : `AI Insight: You're doing great! Keep up the good work reducing food waste.`}
           </p>

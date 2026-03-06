@@ -1,8 +1,7 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function RecipeDetails() {
   const navigate = useNavigate();
-  const { id } = useParams();
 
   return (
     <div className="bg-white min-h-screen pb-24">

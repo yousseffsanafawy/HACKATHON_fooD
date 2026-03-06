@@ -31,12 +31,12 @@ export default function CreatingRecipes() {
           </div>
 
           <div className="absolute top-0 left-1/4 flex flex-col items-center transform -translate-y-4">
-            <div className="w-20 h-20 rounded-full border-2 border-white bg-cover bg-center shadow-xl shadow-primary/10 overflow-hidden" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDAKghEj3QEm7ig_MZ82gbvJ_l7NqRtNrJuZEVr8RyG0yVbOwkMFL2Zlb1LDlZiDgovu7R0WjjGY4gfAd2kn5eG_tWAScQOFRoTMQfslpi8SQi8B97zY-z6KWBlfUx14V_P9BZN0-Sei00CkJHOfhb5P-JvwFZWN2n8xhXERjBhRnDMtsmWdhI2xVjOyT_M9GedR1fhqYqQxj1D096Z0qan110kr2xD1FFW_fb1hH2GAZqxnoVLMBduw1_gPTNjovqzCETYuSe3S1lU')" }}></div>
+            <div className="w-20 h-20 rounded-full border-2 border-white bg-cover bg-center shadow-xl shadow-primary/10 overflow-hidden" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuC3hjf_Eo_wMktvw16u9s5KMM11goVDzOmGtTSC0gARhvymqDOdx1wvCnRX5zgJW8CBOcpBwpKTxz1EGgxOuE30m1WPbeD_oD-oCOdpJLdOU95CgYRrdF-NWmM1fLMdlCnNG0nelvqiErPb95P2-_4w2cjWkjUR_Fzpz0R-DaxYyyv7q-lZl5gDFgOckAGzybVB9V1nQ2YNtLsqXFN6-oDdik_MJMHlEJ72u4PumxczS7X2nahCDYPlWIz8uLYs-IDEcrzPZx7HWqO0')" }}></div>
             <div className="mt-2 px-3 py-1 bg-white/80 backdrop-blur-md rounded-full text-[10px] font-bold tracking-widest uppercase text-slate-500 shadow-sm">Tomato</div>
           </div>
 
           <div className="absolute top-1/4 right-0 flex flex-col items-center transform translate-x-4">
-            <div className="w-24 h-24 rounded-full border-2 border-white bg-cover bg-center shadow-xl shadow-primary/10 overflow-hidden" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuC9mFzDYjiqiAMhyB0TAANBBL69AM80rejReCtU5d4Kd_mqqi9bkwJKBQ7W24q5P2UTMHn33BCqsovkN73gREai9i0bFGOcOzYUNulM3Yqi-5RGjzEm8DmIupK7XlUIQvyS6EIhdKeWxnGqfjwQsrt55nMghfePMnsnp66x0rQN5YZR9zWKnci8JAeLJEYL4uf6HqUvVDLjlwuyh8Hq-SjIehHcux817rLo4Zi9JMo6BhU6GbF6Fcq2sjh36nA9SmPySuABvJZ1xVI5')" }}></div>
+            <div className="w-24 h-24 rounded-full border-2 border-white bg-cover bg-center shadow-xl shadow-primary/10 overflow-hidden" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuC9mFzDYjiAMhyB0TAANBBL69AM80rejReCtU5d4Kd_mqqi9bkwJKBQ7W24q5P2UTMHn33BCqsovkN73gREai9i0bFGOcOzYUNulM3Yqi-5RGjzEm8DmIupK7XlUIQvyS6EIhdKeWxnGqfjwQsrt55nMghfePMnsnp66x0rQN5YZR9zWKnci8JAeLJEYL4uf6HqUvVDLjlwuyh8Hq-SjIehHcux817rLo4Zi9JMo6BhU6GbF6Fcq2sjh36nA9SmPySuABvJZ1xVI5')" }}></div>
             <div className="mt-2 px-3 py-1 bg-white/80 backdrop-blur-md rounded-full text-[10px] font-bold tracking-widest uppercase text-slate-500 shadow-sm">Chicken</div>
           </div>
 
@@ -46,7 +46,7 @@ export default function CreatingRecipes() {
           </div>
 
           <div className="absolute bottom-0 right-1/4 flex flex-col items-center transform translate-y-4">
-            <div className="w-20 h-20 rounded-full border-2 border-white bg-cover bg-center shadow-xl shadow-primary/10 overflow-hidden" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBJWCDcMfPTE-Q-_BfWAiYgQBdfHrV4Vcq6Bwuc9zWrDrxpcAft9cVuZgEIc52Vq8gdnSkzcN9VAZUjn1Y_jIRvpSWl29ocGJdovNux6fYrhWilnScl8Ga9chWQtgS5Zu4J1aqLLQ2ROx9cwQNNj98EDtCA7Ow0OnxbyNFNJrumF9T2FAr1gvPMIdT1EZxa4YZXejP6b6GYvORlM54rYNBydjHIfk8j5FKohYnxOnw9V_2Moh6hnFQZTH8uSukBrwuFOF0C2QX0vyZb')" }}></div>
+            <div className="w-20 h-20 rounded-full border-2 border-white bg-cover bg-center shadow-xl shadow-primary/10 overflow-hidden" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBJWCDcMfPTE-Q-_BfWAiYgQBdfHrV4Vcq6Bwuc9zWrDrxpcAft9cVuZgEIc52Vq8gdnSkzcN9VAZUjn1Y_jIRvpSWl29ocGJdovNux6fYrhWilnScl8Ga9chWQtgS5Zu4J1aqLLQ2ROx9cwQNNj98EDtCA7Ow0OnxbyNFNJrumF9T2FAr1gvPMIdT1EZxa4WXejP6b6GYvORlM54rYNBydjHIfk8j5FKohYnxOnw9V_2Moh6hnFQZTH8uSukBrwuFOF0C2QX0vyZb')" }}></div>
             <div className="mt-2 px-3 py-1 bg-white/80 backdrop-blur-md rounded-full text-[10px] font-bold tracking-widest uppercase text-slate-500 shadow-sm">Pasta</div>
           </div>
 

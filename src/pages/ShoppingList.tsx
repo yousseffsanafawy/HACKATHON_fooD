@@ -16,8 +16,8 @@ export default function ShoppingList() {
     }
   };
 
-  const activeItems = shoppingList.filter(item => !item.checked);
-  const completedItems = shoppingList.filter(item => item.checked);
+  const activeItems = shoppingList.filter((item: any) => !item.checked);
+  const completedItems = shoppingList.filter((item: any) => item.checked);
 
   return (
     <div className="bg-background-light min-h-screen flex flex-col pb-32">
@@ -49,14 +49,14 @@ export default function ShoppingList() {
       </header>
 
       <main className="flex-1 px-6 space-y-8">
-        {activeItems.some(i => i.isAiSuggestion) && (
+        {activeItems.some((i: any) => i.isAiSuggestion) && (
           <section>
             <div className="flex items-center gap-2 mb-4">
               <span className="material-symbols-outlined text-primary text-xl">auto_awesome</span>
               <h2 className="text-xs font-bold uppercase tracking-widest text-emerald-900/50">AI Suggestions</h2>
             </div>
             <div className="grid gap-3">
-              {activeItems.filter(i => i.isAiSuggestion).map(item => (
+              {activeItems.filter((i: any) => i.isAiSuggestion).map((item: any) => (
                 <div key={item.id} className="bg-white/90 p-4 rounded-2xl flex items-center justify-between shadow-sm border border-emerald-100/50 group hover:border-primary/30 transition-colors">
                   <div className="flex items-center gap-4">
                     <button onClick={() => toggleShoppingItem(item.id)} className="w-6 h-6 rounded-full border-2 border-emerald-200 text-primary focus:ring-offset-0 focus:ring-0 cursor-pointer flex items-center justify-center">
@@ -82,7 +82,7 @@ export default function ShoppingList() {
             <h2 className="text-xs font-bold uppercase tracking-widest text-emerald-900/50">To Buy</h2>
           </div>
           <div className="bg-white/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-emerald-100/20 shadow-sm divide-y divide-emerald-50/50">
-            {activeItems.filter(i => !i.isAiSuggestion).map(item => (
+            {activeItems.filter((i: any) => !i.isAiSuggestion).map((item: any) => (
               <div key={item.id} className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-4">
                   <button onClick={() => toggleShoppingItem(item.id)} className="w-6 h-6 rounded-full border-2 border-emerald-200 text-primary focus:ring-offset-0 focus:ring-0 cursor-pointer flex items-center justify-center">
@@ -98,7 +98,7 @@ export default function ShoppingList() {
                 </button>
               </div>
             ))}
-            {activeItems.filter(i => !i.isAiSuggestion).length === 0 && (
+            {activeItems.filter((i: any) => !i.isAiSuggestion).length === 0 && (
               <div className="p-6 text-center text-emerald-600/70 text-sm">No items to buy.</div>
             )}
           </div>
@@ -114,7 +114,7 @@ export default function ShoppingList() {
               <button onClick={clearCompletedShoppingItems} className="text-xs font-bold text-primary">Clear All</button>
             </div>
             <div className="bg-white/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-emerald-100/20 shadow-sm divide-y divide-emerald-50/50">
-              {completedItems.map(item => (
+              {completedItems.map((item: any) => (
                 <div key={item.id} className="flex items-center justify-between p-4 opacity-60">
                   <div className="flex items-center gap-4">
                     <button onClick={() => toggleShoppingItem(item.id)} className="w-6 h-6 rounded-full bg-primary border-2 border-primary text-white flex items-center justify-center">

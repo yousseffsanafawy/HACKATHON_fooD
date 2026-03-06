@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { addDays, isBefore, isAfter, parseISO } from 'date-fns';
+import { addDays, differenceInDays, parseISO } from 'date-fns';
 
-export type Category = 'Vegetables' | 'Fruits' | 'Dairy' | 'Meat' | 'Pantry' | 'Beverages';
+export type Category = 'Vegetables' | 'Fruits' | 'Dairy' | 'Meat' | 'Poultry' | 'Pantry' | 'Beverages';
 export type Location = 'Fridge' | 'Pantry' | 'Freezer';
 
 export interface InventoryItem {
@@ -11,8 +11,8 @@ export interface InventoryItem {
   unit: string;
   category: Category;
   location: Location;
-  expiryDate: string; // ISO string
-  addedDate: string; // ISO string
+  expiryDate: string;
+  addedDate: string;
   imageUrl?: string;
 }
 
@@ -20,7 +20,7 @@ export interface Recipe {
   id: string;
   title: string;
   image: string;
-  time: number; // minutes
+  time: number;
   calories: number;
   tags: string[];
   ingredients: { name: string; amount: string; inInventory: boolean }[];
@@ -47,23 +47,30 @@ interface AppState {
     co2Prevented: number;
     wasteReduced: number;
   };
-  
-  // Actions
+  isLoading: boolean;
+  error: string | null;
+
+  syncWithFirebase: (userId: string) => void;
+  unsubscribe: (() => void) | null;
+
   login: (email: string) => void;
   logout: () => void;
-  
-  addInventoryItem: (item: Omit<InventoryItem, 'id' | 'addedDate'>) => void;
-  removeInventoryItem: (id: string) => void;
-  updateInventoryItem: (id: string, updates: Partial<InventoryItem>) => void;
-  
+
+  addInventoryItem: (item: Omit<InventoryItem, 'id' | 'addedDate'>) => Promise<void>;
+  removeInventoryItem: (id: string) => Promise<void>;
+  updateInventoryItem: (id: string, updates: Partial<InventoryItem>) => Promise<void>;
+
   toggleSaveRecipe: (recipe: Recipe) => void;
+
+  addShoppingItem: (name: string, isAiSuggestion?: boolean, category?: string) => Promise<void>;
+  toggleShoppingItem: (id: string) => Promise<void>;
+  removeShoppingItem: (id: string) => Promise<void>;
+  clearCompletedShoppingItems: () => Promise<void>;
+
+  recordWastePrevention: (itemValue: number, weightKg: number, userId?: string) => Promise<void>;
   
-  addShoppingItem: (name: string, isAiSuggestion?: boolean) => void;
-  toggleShoppingItem: (id: string) => void;
-  removeShoppingItem: (id: string) => void;
-  clearCompletedShoppingItems: () => void;
-  
-  recordWastePrevention: (itemValue: number, weightKg: number) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
 }
 
 const initialInventory: InventoryItem[] = [
@@ -108,8 +115,8 @@ const initialShoppingList: ShoppingItem[] = [
   { id: 's3', name: 'Olive Oil', checked: false, category: 'Pantry', isAiSuggestion: true },
 ];
 
-export const useAppStore = create<AppState>((set) => ({
-  user: { name: 'Julian', email: 'julian@example.com', isPremium: true },
+export const useAppStore = create<AppState>((set, get) => ({
+  user: null,
   inventory: initialInventory,
   savedRecipes: [],
   shoppingList: initialShoppingList,
@@ -119,53 +126,113 @@ export const useAppStore = create<AppState>((set) => ({
     co2Prevented: 34.2,
     wasteReduced: 12.5,
   },
+  isLoading: false,
+  error: null,
+  unsubscribe: null,
 
-  login: (email) => set({ user: { name: email.split('@')[0], email, isPremium: false } }),
-  logout: () => set({ user: null }),
+  syncWithFirebase: () => {
+    // Demo mode - no Firebase sync
+    console.log('Demo mode: Using local data');
+  },
 
-  addInventoryItem: (item) => set((state) => ({
-    inventory: [...state.inventory, { ...item, id: Math.random().toString(36).substr(2, 9), addedDate: new Date().toISOString() }]
-  })),
-  
-  removeInventoryItem: (id) => set((state) => ({
-    inventory: state.inventory.filter(i => i.id !== id)
-  })),
-  
-  updateInventoryItem: (id, updates) => set((state) => ({
-    inventory: state.inventory.map(i => i.id === id ? { ...i, ...updates } : i)
-  })),
+  login: (email: string) => set({ user: { name: email.split('@')[0], email, isPremium: true } }),
+  logout: () => {
+    const unsubscribe = get().unsubscribe;
+    if (unsubscribe) {
+      unsubscribe();
+    }
+    set({ user: null });
+  },
 
-  toggleSaveRecipe: (recipe) => set((state) => {
-    const exists = state.savedRecipes.find(r => r.id === recipe.id);
+  addInventoryItem: async (item) => {
+    set({ isLoading: true });
+    const newItem: InventoryItem = {
+      ...item,
+      id: Math.random().toString(36).substr(2, 9),
+      addedDate: new Date().toISOString(),
+    };
+    set((state) => ({
+      inventory: [...state.inventory, newItem],
+      isLoading: false,
+    }));
+  },
+
+  removeInventoryItem: async (id: string) => {
+    const item = get().inventory.find((i: InventoryItem) => i.id === id);
+    
+    // Auto-add to shopping list if item was in Fridge and not expired
+    if (item && item.location === 'Fridge') {
+      const daysLeft = differenceInDays(parseISO(item.expiryDate), new Date());
+      if (daysLeft > 0) {
+        await get().addShoppingItem(item.name, false, item.category);
+      }
+    }
+    
+    set((state) => ({
+      inventory: state.inventory.filter((i: InventoryItem) => i.id !== id),
+    }));
+  },
+
+  updateInventoryItem: async (id: string, updates: Partial<InventoryItem>) => {
+    set((state) => ({
+      inventory: state.inventory.map((i: InventoryItem) => 
+        i.id === id ? { ...i, ...updates } : i
+      ),
+    }));
+  },
+
+  toggleSaveRecipe: (recipe: Recipe) => set((state) => {
+    const exists = state.savedRecipes.find((r: Recipe) => r.id === recipe.id);
     if (exists) {
-      return { savedRecipes: state.savedRecipes.filter(r => r.id !== recipe.id) };
+      return { savedRecipes: state.savedRecipes.filter((r: Recipe) => r.id !== recipe.id) };
     }
     return { savedRecipes: [...state.savedRecipes, { ...recipe, isSaved: true }] };
   }),
 
-  addShoppingItem: (name, isAiSuggestion = false) => set((state) => ({
-    shoppingList: [...state.shoppingList, { id: Math.random().toString(36).substr(2, 9), name, checked: false, isAiSuggestion }]
-  })),
-  
-  toggleShoppingItem: (id) => set((state) => ({
-    shoppingList: state.shoppingList.map(i => i.id === id ? { ...i, checked: !i.checked } : i)
-  })),
-  
-  removeShoppingItem: (id) => set((state) => ({
-    shoppingList: state.shoppingList.filter(i => i.id !== id)
-  })),
-  
-  clearCompletedShoppingItems: () => set((state) => ({
-    shoppingList: state.shoppingList.filter(i => !i.checked)
-  })),
+  addShoppingItem: async (name: string, isAiSuggestion = false, category?: string) => {
+    set((state) => ({
+      shoppingList: [...state.shoppingList, { 
+        id: Math.random().toString(36).substr(2, 9), 
+        name, 
+        checked: false,
+        isAiSuggestion,
+        category 
+      }],
+    }));
+  },
 
-  recordWastePrevention: (itemValue, weightKg) => set((state) => ({
-    impact: {
-      ...state.impact,
-      mealsSaved: state.impact.mealsSaved + Math.round(weightKg * 2),
-      moneySaved: state.impact.moneySaved + itemValue,
-      co2Prevented: state.impact.co2Prevented + (weightKg * 2.5),
-      wasteReduced: state.impact.wasteReduced + weightKg,
-    }
-  }))
+  toggleShoppingItem: async (id: string) => {
+    set((state) => ({
+      shoppingList: state.shoppingList.map((i: ShoppingItem) => 
+        i.id === id ? { ...i, checked: !i.checked } : i
+      ),
+    }));
+  },
+
+  removeShoppingItem: async (id: string) => {
+    set((state) => ({
+      shoppingList: state.shoppingList.filter((i: ShoppingItem) => i.id !== id),
+    }));
+  },
+
+  clearCompletedShoppingItems: async () => {
+    set((state) => ({
+      shoppingList: state.shoppingList.filter((i: ShoppingItem) => !i.checked),
+    }));
+  },
+
+  recordWastePrevention: async (itemValue: number, weightKg: number) => {
+    set((state) => ({
+      impact: {
+        ...state.impact,
+        mealsSaved: state.impact.mealsSaved + Math.round(weightKg * 2),
+        moneySaved: state.impact.moneySaved + itemValue,
+        co2Prevented: state.impact.co2Prevented + (weightKg * 2.5),
+        wasteReduced: state.impact.wasteReduced + weightKg,
+      }
+    }));
+  },
+  
+  setLoading: (loading: boolean) => set({ isLoading: loading }),
+  setError: (error: string | null) => set({ error }),
 }));

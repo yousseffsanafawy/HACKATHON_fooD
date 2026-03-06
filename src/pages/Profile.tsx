@@ -1,15 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
-import { useAppStore } from "../store";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user, logout } = useAppStore();
+  const { user, logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/auth");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/auth");
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
+
+  const userName = user?.displayName || user?.name || 'Guest';
+  const userEmail = user?.email || 'Not logged in';
 
   return (
     <div className="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-gradient-to-b from-mint-soft to-background-light overflow-x-hidden pb-[88px]">
@@ -33,8 +40,8 @@ export default function Profile() {
           </div>
         </div>
         <div className="mt-4 text-center">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">{user?.name || 'Guest'}</h2>
-          <p className="text-slate-500 font-medium">{user?.email || 'Not logged in'}</p>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900">{userName}</h2>
+          <p className="text-slate-500 font-medium">{userEmail}</p>
         </div>
         <div className="mt-6 flex gap-3">
           <span className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">Premium Member</span>
@@ -42,6 +49,19 @@ export default function Profile() {
       </section>
 
       <main className="px-4 space-y-4">
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group cursor-pointer" onClick={() => navigate("/insights")}>
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <span className="material-symbols-outlined">insights</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Insights</p>
+              <p className="text-xs text-slate-500">View your food analytics</p>
+            </div>
+          </div>
+          <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">chevron_right</span>
+        </div>
+
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group cursor-pointer" onClick={() => navigate("/shopping-list")}>
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
@@ -111,21 +131,21 @@ export default function Profile() {
         </div>
 
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 divide-y divide-slate-100">
-          <div className="flex items-center justify-between py-3 first:pt-0 cursor-pointer group">
+          <div className="flex items-center justify-between py-3 first:pt-0 cursor-pointer group" onClick={() => navigate("/settings")}>
             <div className="flex items-center gap-4">
               <span className="material-symbols-outlined text-slate-400 group-hover:text-primary">settings</span>
               <p className="text-sm font-medium text-slate-700">App Settings</p>
             </div>
             <span className="material-symbols-outlined text-slate-300 text-sm">chevron_right</span>
           </div>
-          <div className="flex items-center justify-between py-3 cursor-pointer group">
+          <div className="flex items-center justify-between py-3 cursor-pointer group" onClick={() => navigate("/privacy")}>
             <div className="flex items-center gap-4">
               <span className="material-symbols-outlined text-slate-400 group-hover:text-primary">security</span>
               <p className="text-sm font-medium text-slate-700">Privacy & Security</p>
             </div>
             <span className="material-symbols-outlined text-slate-300 text-sm">chevron_right</span>
           </div>
-          <div className="flex items-center justify-between py-3 last:pb-0 cursor-pointer group">
+          <div className="flex items-center justify-between py-3 last:pb-0 cursor-pointer group" onClick={() => navigate("/help")}>
             <div className="flex items-center gap-4">
               <span className="material-symbols-outlined text-slate-400 group-hover:text-primary">help</span>
               <p className="text-sm font-medium text-slate-700">Help Center</p>

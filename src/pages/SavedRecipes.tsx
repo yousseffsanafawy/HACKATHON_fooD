@@ -46,7 +46,7 @@ export default function SavedRecipes() {
             <p className="text-slate-500">Recipes you save will appear here.</p>
           </div>
         ) : (
-          savedRecipes.map(recipe => (
+          savedRecipes.map((recipe: any) => (
             <div key={recipe.id} className="flex flex-col gap-0 rounded-xl bg-white shadow-[0_10px_25px_-5px_rgba(0,0,0,0.05)] overflow-hidden group">
               <Link to={`/recipes/${recipe.id}`} className="relative w-full aspect-[4/5] overflow-hidden block">
                 <button 

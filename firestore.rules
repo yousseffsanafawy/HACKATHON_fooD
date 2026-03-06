@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the data
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Users collection - each user can only access their own data
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      
+      // Inventory subcollection
+      match /inventory/{itemId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // Shopping list subcollection
+      match /shoppingList/{itemId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // Saved recipes subcollection
+      match /savedRecipes/{recipeId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // Impact stats subcollection
+      match /impact/{document=**} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+    
+    // Global recipes collection (read-only for all authenticated users)
+    match /recipes/{recipeId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admins can write (implement admin check if needed)
+    }
+  }
+}
