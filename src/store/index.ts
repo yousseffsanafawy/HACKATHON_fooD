@@ -61,6 +61,7 @@ interface AppState {
   updateInventoryItem: (id: string, updates: Partial<InventoryItem>) => Promise<void>;
 
   toggleSaveRecipe: (recipe: Recipe) => void;
+  toggleSavedRecipe: (recipe: Recipe) => void;
 
   addShoppingItem: (name: string, isAiSuggestion?: boolean, category?: string) => Promise<void>;
   toggleShoppingItem: (id: string) => Promise<void>;
@@ -182,6 +183,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   toggleSaveRecipe: (recipe: Recipe) => set((state) => {
+    const exists = state.savedRecipes.find((r: Recipe) => r.id === recipe.id);
+    if (exists) {
+      return { savedRecipes: state.savedRecipes.filter((r: Recipe) => r.id !== recipe.id) };
+    }
+    return { savedRecipes: [...state.savedRecipes, { ...recipe, isSaved: true }] };
+  }),
+
+  toggleSavedRecipe: (recipe: Recipe) => set((state) => {
     const exists = state.savedRecipes.find((r: Recipe) => r.id === recipe.id);
     if (exists) {
       return { savedRecipes: state.savedRecipes.filter((r: Recipe) => r.id !== recipe.id) };

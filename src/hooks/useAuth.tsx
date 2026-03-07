@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('smartfood_user', JSON.stringify(newUser));
   };
 
-  const logout = () => {
+  const logout = async () => {
     setUser(null);
     localStorage.removeItem('smartfood_user');
   };

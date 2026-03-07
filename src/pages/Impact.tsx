@@ -5,6 +5,7 @@ import { useAppStore } from "../store";
 export default function Impact() {
   const navigate = useNavigate();
   const { impact } = useAppStore();
+  const { mealsSaved, moneySaved, wasteReduced, co2Prevented } = impact;
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-gradient-to-b from-[#ECFDF5] to-[#F9FAFB] max-w-md mx-auto overflow-x-hidden pb-[88px]">
@@ -36,7 +37,7 @@ export default function Impact() {
             <span className="material-symbols-outlined text-primary text-sm">restaurant</span>
             <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Meals saved this month</p>
           </div>
-          <p className="text-4xl font-bold text-slate-900">{(impact.foodSaved * 2).toFixed(0)}</p>
+          <p className="text-4xl font-bold text-slate-900">{(wasteReduced * 2).toFixed(0)}</p>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex items-center gap-2 mb-2">
@@ -50,7 +51,7 @@ export default function Impact() {
             <span className="material-symbols-outlined text-primary text-sm">delete_sweep</span>
             <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider">Waste reduced</p>
           </div>
-          <p className="text-2xl font-bold text-slate-900">{impact.foodSaved.toFixed(1)}kg</p>
+          <p className="text-2xl font-bold text-slate-900">{wasteReduced.toFixed(1)}kg</p>
         </div>
       </div>
 
@@ -109,7 +110,7 @@ export default function Impact() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold">Water Saved</p>
-              <p className="text-xs text-slate-500">You saved approx. {impact.waterSaved.toFixed(0)}L of water this week.</p>
+              <p className="text-xs text-slate-500">You saved approx. {(co2Prevented * 10).toFixed(0)}L of water this week.</p>
             </div>
             <span className="material-symbols-outlined text-slate-300">chevron_right</span>
           </div>
@@ -119,7 +120,7 @@ export default function Impact() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold">CO2 Emission</p>
-              <p className="text-xs text-slate-500">Prevented {impact.co2Saved.toFixed(1)}kg of CO2 entering atmosphere.</p>
+              <p className="text-xs text-slate-500">Prevented {co2Prevented.toFixed(1)}kg of CO2 entering atmosphere.</p>
             </div>
             <span className="material-symbols-outlined text-slate-300">chevron_right</span>
           </div>
